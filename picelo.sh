@@ -30,10 +30,12 @@ function loop_files() {
             cd ..
         else
             if [[ "$file" =~ \.(jpg|jpeg|png|gif)$ ]]; then
+              echo "processing $file"
               compress_image "$(pwd)/${file}"
             fi
 
             if [[ "$file" =~ \.(htm|html|md|mdx)$ ]]; then
+              echo "processing $file"
               grep -Eo '(http|https)://[^)"]+\.(png|jpg|jpeg|gif)' "$file" | sed 's/#.*//' | sort -u | while read url; do
                 url=$(curl -sd "link=$url&concise=true" https://deref.gourav.sh/api)
 
@@ -49,7 +51,7 @@ function loop_files() {
                   compress_image "$newPath"
                   rm -rf "$path"
                 else
-                  echo "[Info]: $filename.$extension already processed"
+                  echo "    $filename.$extension already processed"
                 fi
               done
             fi
@@ -64,4 +66,6 @@ while getopts "e:" opt; do
   esac
 done
 
+echo "Current directory: $(pwd)"
+echo ""
 loop_files "$(pwd)" "$skip_pattern"
